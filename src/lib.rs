@@ -33,17 +33,17 @@ impl Universe {
     /// count how many of its neighbors are alive
     fn live_neighbor_count(&self, row: u32, col: u32) -> u8 {
         let mut count = 0;
-        for delta_row in [self.height - 1, 0, 1].iter().cloned() {
-            for delta_col in [self.width - 1, 0, 1].iter().cloned() {
-                if delta_row == 0 && delta_col == 0 {
+        for delta_row in [self.height - 1, 0, 1].iter() {
+            for delta_col in [self.width - 1, 0, 1].iter() {
+                if delta_row == &0 && delta_col == &0 {
                     continue;
                 }
-
-                // 불필요한 if 문을 없애기 위한 조치
                 let neighbor_row = (row + delta_row) % self.height;
                 let neighbor_col = (col + delta_col) % self.width;
-                let idx = self.get_index(neighbor_row, neighbor_col);
-                count += self.cells[idx] as u8;
+                count += match self.cells[self.get_index(neighbor_row, neighbor_col)] {
+                    Cell::Alive => 1,
+                    _ => 0,
+                };
             }
         }
         count
