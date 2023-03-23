@@ -4,6 +4,8 @@ use getrandom::*;
 use std::fmt;
 use wasm_bindgen::prelude::*;
 
+extern crate js_sys;
+
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
 #[cfg(feature = "wee_alloc")]
@@ -106,16 +108,9 @@ impl Universe {
     }
 
     pub fn new(width: u32, height: u32) -> Self {
-        const SIZE: usize = 1 << 16;
-        let mut randbuf = [0; SIZE];
-        getrandom(&mut randbuf).expect("getrandom failed");
-
         let cells = (0..width * height)
-            .map(|i| {
-                if (i + 1) as usize % SIZE == 0 {
-                    getrandom(&mut randbuf).expect("getrandom failed");
-                }
-                if dbg!(randbuf[i as usize % SIZE]) & 15 == 0 {
+            .map(|_| {
+                if js_sys::Math::random() < 0.04 {
                     Cell::Alive
                 } else {
                     Cell::Dead
