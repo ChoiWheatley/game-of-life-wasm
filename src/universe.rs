@@ -2,6 +2,7 @@ use crate::bitset::*;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
+#[derive(PartialEq, Debug)]
 pub struct Universe {
     width: u32,
     height: u32,
@@ -31,7 +32,7 @@ impl Universe {
     }
 }
 
-/// getter
+/// getter, setter
 #[wasm_bindgen]
 impl Universe {
     pub fn width(&self) -> u32 {
@@ -44,6 +45,16 @@ impl Universe {
 
     pub fn cells(&self) -> *const u32 {
         self.cells.as_ptr()
+    }
+}
+
+// internal setter
+impl Universe {
+    pub fn set_cells(&mut self, cells: &[(u32, u32)]) {
+        for (row, col) in cells.iter().cloned() {
+            let idx = self.get_index(row, col);
+            self.cells.set(idx);
+        }
     }
 }
 

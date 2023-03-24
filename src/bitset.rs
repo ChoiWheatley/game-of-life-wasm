@@ -8,6 +8,7 @@ const fn inner_idx(idx: usize) -> usize {
 }
 
 #[wasm_bindgen]
+#[derive(PartialEq, Eq, Debug)]
 pub struct Bitset {
     bits: Vec<u32>,
 }
@@ -15,7 +16,7 @@ pub struct Bitset {
 #[wasm_bindgen]
 impl Bitset {
     pub fn with_size(size: usize) -> Self {
-        let size = bin_no(size);
+        let size = bin_no(size) + 1;
         let mut v = Vec::with_capacity(size);
         v.resize(size, 0);
         Bitset { bits: v }
@@ -59,12 +60,12 @@ mod tests {
     #[test]
     fn test_init() {
         let bs = Bitset::with_size(32);
-        assert_eq!(1, bs.bits.len());
+        assert_eq!(2, bs.bits.len());
         for i in 0..32 {
             assert_eq!(false, bs.get(i), "in index {i}");
         }
         let bs = Bitset::with_size(128);
-        assert_eq!(4, bs.bits.len());
+        assert_eq!(5, bs.bits.len());
         for i in 0..128 {
             assert_eq!(false, bs.get(i), "in index {}", i);
         }
