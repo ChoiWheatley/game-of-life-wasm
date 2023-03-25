@@ -8,7 +8,7 @@ const fn inner_idx(idx: usize) -> usize {
 }
 
 #[wasm_bindgen]
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq, Eq, Debug, Clone)]
 pub struct Bitset {
     bits: Vec<u32>,
 }
@@ -19,6 +19,15 @@ impl Bitset {
         let size = bin_no(size) + 1;
         let mut v = Vec::with_capacity(size);
         v.resize(size, 0);
+        Bitset { bits: v }
+    }
+    pub fn from_indices(indices: &[usize]) -> Self {
+        let size = bin_no(indices.len()) + 1;
+        let mut v = Vec::with_capacity(size);
+        v.resize(size, 0);
+        for i in indices.iter().cloned() {
+            *v.get_mut(bin_no(i)).expect("Index Out of Bounds") |= 1 << inner_idx(i);
+        }
         Bitset { bits: v }
     }
 }
@@ -68,6 +77,20 @@ mod tests {
         assert_eq!(5, bs.bits.len());
         for i in 0..128 {
             assert_eq!(false, bs.get(i), "in index {}", i);
+        }
+    }
+
+    #[test]
+    fn test_set_get() {
+        let size = 128;
+        let mut bs = Bitset::with_size(size);
+        for i in 0..size {
+            bs.set(i);
+            assert!(bs.get(i));
+        }
+        for i in (0..size).rev() {
+            bs.reset(i);
+            assert!(!bs.get(i));
         }
     }
 }

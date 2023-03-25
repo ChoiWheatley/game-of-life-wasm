@@ -17,9 +17,9 @@ impl Universe {
     /// count how many of its neighbors are alive
     fn live_neighbor_count(&self, row: u32, col: u32) -> u8 {
         let mut count = 0;
-        for delta_row in [self.height - 1, 0, 1].iter() {
-            for delta_col in [self.width - 1, 0, 1].iter() {
-                if delta_row == &0 && delta_col == &0 {
+        for delta_row in [self.height - 1, 0, 1].iter().cloned() {
+            for delta_col in [self.width - 1, 0, 1].iter().cloned() {
+                if delta_row == 0 && delta_col == 0 {
                     continue;
                 }
                 let neighbor_row = (row + delta_row) % self.height;
@@ -46,6 +46,11 @@ impl Universe {
     pub fn cells(&self) -> *const u32 {
         self.cells.as_ptr()
     }
+
+    pub fn set_cell(&mut self, row: u32, col: u32) {
+        let idx = self.get_index(row, col);
+        self.cells.set(idx);
+    }
 }
 
 // internal setter
@@ -61,6 +66,8 @@ impl Universe {
 #[wasm_bindgen]
 impl Universe {
     pub fn tick(&mut self) {
+        let mut tmp_cell = self.cells.clone();
+
         for row in 0..self.height {
             for col in 0..self.width {
                 let idx = self.get_index(row, col);
@@ -87,21 +94,59 @@ impl Universe {
                     (otherwise, _) => otherwise,
                 };
 
-                self.cells.set_to(idx, next_cell);
+                // replace temporally
+                tmp_cell.set_to(idx, next_cell);
             }
         }
+        // finally apply result cells
+        self.cells = tmp_cell;
     }
 
-    pub fn new(width: u32, height: u32) -> Self {
+    pub fn with_random_start(width: u32, height: u32, density: f64) -> Self {
         let size = (width * height) as usize;
         let mut cells = Bitset::with_size(size);
         for i in 0..size {
-            cells.set_to(i, js_sys::Math::random() < 0.04);
+            cells.set_to(i, js_sys::Math::random() < density);
         }
         Universe {
             width,
             height,
             cells,
+        }
+    }
+
+    /// create empty universe
+    pub fn new(width: u32, height: u32) -> Self {
+        let size = (width * height) as usize;
+        let cells = Bitset::with_size(size);
+        Universe {
+            width,
+            height,
+            cells,
+        }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    #[test]
+    fn test_live_neighbor() {
+        const W: u32 = 4;
+        const H: u32 = 4;
+        let mut u = Universe::new(W, H);
+        u.set_cell(0, 0);
+        let answer = [[0, 1, 0, 1], [1, 1, 0, 1], [0, 0, 0, 0], [1, 1, 0, 1]];
+        for (i, line) in answer.iter().enumerate() {
+            for (j, elem) in line.iter().enumerate() {
+                assert_eq!(
+                    *elem,
+                    u.live_neighbor_count(i as u32, j as u32),
+                    "in index ({}, {})",
+                    i,
+                    j
+                );
+            }
         }
     }
 }
