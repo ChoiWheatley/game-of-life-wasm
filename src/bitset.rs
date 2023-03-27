@@ -1,7 +1,5 @@
 use std::mem::size_of;
 
-use wasm_bindgen::prelude::*;
-
 fn bin_no(idx: usize) -> usize {
     idx / (size_of::<usize>() * 8)
 }
@@ -9,13 +7,11 @@ fn inner_idx(idx: usize) -> usize {
     idx % (size_of::<usize>() * 8)
 }
 
-#[wasm_bindgen]
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub struct Bitset {
     bits: Vec<usize>,
 }
 
-#[wasm_bindgen]
 impl Bitset {
     pub fn with_size(size: usize) -> Self {
         let size = bin_no(size) + 1;
@@ -34,7 +30,6 @@ impl Bitset {
     }
 }
 
-#[wasm_bindgen]
 impl Bitset {
     pub fn get(&self, idx: usize) -> bool {
         self.bits.get(bin_no(idx)).expect("Index Out of Bounds") >> inner_idx(idx) & 0b01 == 1
