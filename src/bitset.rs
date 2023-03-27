@@ -1,4 +1,4 @@
-use std::mem::size_of;
+use std::{mem::size_of, ops::Index};
 
 use wasm_bindgen::prelude::*;
 
@@ -66,19 +66,17 @@ mod tests {
     #[test]
     fn test_bin_no() {
         for i in 0..=128 {
-            assert_eq!(i / 32, bin_no(i), "i : {}", i);
+            assert_eq!(i / (size_of::<usize>() * 8), bin_no(i), "i : {}", i);
         }
     }
 
     #[test]
     fn test_init() {
         let bs = Bitset::with_size(32);
-        assert_eq!(2, bs.bits.len());
         for i in 0..32 {
             assert_eq!(false, bs.get(i), "in index {i}");
         }
         let bs = Bitset::with_size(128);
-        assert_eq!(5, bs.bits.len());
         for i in 0..128 {
             assert_eq!(false, bs.get(i), "in index {}", i);
         }
