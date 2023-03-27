@@ -1,3 +1,5 @@
+use std::mem::size_of;
+
 use wasm_bindgen::prelude::*;
 
 fn bin_no(idx: usize) -> usize {
@@ -10,7 +12,7 @@ fn inner_idx(idx: usize) -> usize {
 #[wasm_bindgen]
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub struct Bitset {
-    bits: Vec<u32>,
+    bits: Vec<usize>,
 }
 
 #[wasm_bindgen]
@@ -50,7 +52,7 @@ impl Bitset {
             self.reset(idx);
         }
     }
-    pub fn as_ptr(&self) -> *const u32 {
+    pub fn as_ptr(&self) -> *const usize {
         self.bits.as_ptr()
     }
 }

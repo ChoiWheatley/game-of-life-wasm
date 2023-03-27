@@ -43,7 +43,7 @@ impl Universe {
         self.height
     }
 
-    pub fn cells(&self) -> *const u32 {
+    pub fn cells(&self) -> *const usize {
         self.cells.as_ptr()
     }
 
