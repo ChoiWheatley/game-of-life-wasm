@@ -1,10 +1,10 @@
 use wasm_bindgen::prelude::*;
 
-const fn bin_no(idx: usize) -> usize {
-    idx / 32
+fn bin_no(idx: usize) -> usize {
+    idx / (size_of::<usize>() * 8)
 }
-const fn inner_idx(idx: usize) -> usize {
-    idx % 32
+fn inner_idx(idx: usize) -> usize {
+    idx % (size_of::<usize>() * 8)
 }
 
 #[wasm_bindgen]
