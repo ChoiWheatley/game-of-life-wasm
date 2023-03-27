@@ -52,6 +52,8 @@ impl Bitset {
             self.reset(idx);
         }
     }
+    /// JS에게 opaque handle을 제공해 주기 위한 raw pointer 제공자.
+    /// JS 단에서 매번 get, set을 호출할 수도 있겠지만 잦은 wasm 함수 호출은 병목현상이 발생할 수 있다고 하대?
     pub fn as_ptr(&self) -> *const usize {
         self.bits.as_ptr()
     }
