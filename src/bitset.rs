@@ -1,10 +1,8 @@
-use std::mem::size_of;
-
 fn bin_no(idx: usize) -> usize {
-    idx / (size_of::<usize>() * 8)
+    idx / (usize::BITS as usize)
 }
 fn inner_idx(idx: usize) -> usize {
-    idx % (size_of::<usize>() * 8)
+    idx % (usize::BITS as usize)
 }
 
 #[derive(PartialEq, Eq, Debug, Clone)]
@@ -15,14 +13,12 @@ pub struct Bitset {
 impl Bitset {
     pub fn with_size(size: usize) -> Self {
         let size = bin_no(size) + 1;
-        let mut v = Vec::with_capacity(size);
-        v.resize(size, 0);
+        let v = vec![0; size];
         Bitset { bits: v }
     }
     pub fn from_indices(indices: &[usize]) -> Self {
         let size = bin_no(indices.len()) + 1;
-        let mut v = Vec::with_capacity(size);
-        v.resize(size, 0);
+        let mut v = vec![0; size];
         for i in indices.iter().cloned() {
             *v.get_mut(bin_no(i)).expect("Index Out of Bounds") |= 1 << inner_idx(i);
         }
@@ -61,7 +57,7 @@ mod tests {
     #[test]
     fn test_bin_no() {
         for i in 0..=128 {
-            assert_eq!(i / (size_of::<usize>() * 8), bin_no(i), "i : {}", i);
+            assert_eq!(i / (usize::BITS as usize), bin_no(i), "i : {}", i);
         }
     }
 
