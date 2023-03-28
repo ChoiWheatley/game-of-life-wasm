@@ -66,6 +66,7 @@ impl Universe {
 #[wasm_bindgen]
 impl Universe {
     pub fn tick(&mut self) {
+        web_sys::console::time_with_label("tick");
         let mut tmp_cell = self.cells.clone();
 
         for row in 0..self.height {
@@ -100,6 +101,7 @@ impl Universe {
         }
         // finally apply result cells
         self.cells = tmp_cell;
+        web_sys::console::time_end_with_label("tick");
     }
 
     pub fn with_random_start(width: u32, height: u32, density: f64) -> Self {
